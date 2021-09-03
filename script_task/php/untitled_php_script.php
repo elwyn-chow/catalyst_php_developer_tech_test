@@ -90,4 +90,15 @@ if (!isset($options["h"])) {
 }
 $db_host = $options["h"];
 
-var_dump($options);
+//------------------------------------------------------------------------------
+
+mysqli_report(MYSQLI_REPORT_STRICT | MYSQLI_REPORT_ALL);
+
+try {
+	$db = new mysqli($db_host, $db_user, $db_password, DATABASE_NAME);
+}
+catch (mysqli_sql_exception $e) {
+	die("Could not open connection to database: " . $e->getMessage() . "\n");
+}
+
+echo "Connection created\n";
