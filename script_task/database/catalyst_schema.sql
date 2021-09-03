@@ -16,13 +16,13 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `user_data`
+-- Table structure for table `user`
 --
 
-DROP TABLE IF EXISTS `user_data`;
+DROP TABLE IF EXISTS `user`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `user_data` (
+CREATE TABLE `user` (
   `name` varchar(80) DEFAULT NULL,
   `surname` varchar(80) DEFAULT NULL,
   `email` varchar(160) NOT NULL,
@@ -31,12 +31,12 @@ CREATE TABLE `user_data` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `user_data`
+-- Dumping data for table `user`
 --
 
-LOCK TABLES `user_data` WRITE;
-/*!40000 ALTER TABLE `user_data` DISABLE KEYS */;
-/*!40000 ALTER TABLE `user_data` ENABLE KEYS */;
+LOCK TABLES `user` WRITE;
+/*!40000 ALTER TABLE `user` DISABLE KEYS */;
+/*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

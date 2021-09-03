@@ -1,10 +1,10 @@
 <?php
 use PHPUnit\Framework\Testcase;
 
-final class denominationsTest extends TestCase {
+final class foobarTest extends TestCase {
 	// The output should be CSV with 100 values
 	public function testOutputCount(): void {
-		$output = `php src/denominations.php`;
+		$output = `php src/foobar.php`;
 
 		$parsed = str_getcsv($output, ',');
 
@@ -16,7 +16,7 @@ final class denominationsTest extends TestCase {
 
 	// Each value in the CSV should be a number, foo, bar, or foobar
 	public function testOutputValuesFormat(): void {
-		$output = `php src/denominations.php`;
+		$output = `php src/foobar.php`;
 
 		$parsed = str_getcsv($output, ',');
 
@@ -31,7 +31,7 @@ final class denominationsTest extends TestCase {
 
 	// Test some specific values
 	public function testOutputSpecific(): void {
-		$output = `php src/denominations.php`;
+		$output = `php src/foobar.php`;
 
 		$parsed = str_getcsv($output, ',');
 

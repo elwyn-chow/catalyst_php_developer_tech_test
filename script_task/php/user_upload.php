@@ -42,7 +42,7 @@ EOD;
 // Global variables and constants
 //------------------------------------------------------------------------------
 define('DATABASE_NAME', 'catalyst');
-define('TABLE_NAME', 'user_data');
+define('TABLE_NAME', 'user');
 
 $dry_run_mode = false;
 
