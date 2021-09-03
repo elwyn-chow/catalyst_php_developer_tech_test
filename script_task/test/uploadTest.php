@@ -191,12 +191,23 @@ final class uploadTest extends TestCase {
 		$user = $ini_array["correctdb"]["user"];
 		$password = $ini_array["correctdb"]["password"];
 		$host = $ini_array["correctdb"]["host"];
+		$database = $ini_array["correctdb"]["database"];
 		$csv = $ini_array["csv"]["too_many_columns"];
+
+		$db = new mysqli(
+			$host,
+			$user,
+			$password,
+			$database
+		);
+
+		// Delete rows of user table
+		$result = $db->query("delete from user"); 
 
 		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
 
 		$this->assertRegExp(
-			"/WARNING: While parsing the line number 1, there were 4 fields when 3 were expected. Skipping this row.../",
+			"/WARNING: While parsing the line number \d+, there were 4 fields when 3 were expected. Skipping this row.../",
 			$output	
 		);
 	}
@@ -207,7 +218,18 @@ final class uploadTest extends TestCase {
 		$user = $ini_array["correctdb"]["user"];
 		$password = $ini_array["correctdb"]["password"];
 		$host = $ini_array["correctdb"]["host"];
+		$database = $ini_array["correctdb"]["database"];
 		$csv = $ini_array["csv"]["too_few_columns"];
+
+		$db = new mysqli(
+			$host,
+			$user,
+			$password,
+			$database
+		);
+
+		// Delete rows of user table
+		$result = $db->query("delete from user"); 
 
 		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
 
@@ -224,7 +246,18 @@ final class uploadTest extends TestCase {
 		$user = $ini_array["correctdb"]["user"];
 		$password = $ini_array["correctdb"]["password"];
 		$host = $ini_array["correctdb"]["host"];
+		$database = $ini_array["correctdb"]["database"];
 		$csv = $ini_array["csv"]["invalid_email_address"];
+
+		$db = new mysqli(
+			$host,
+			$user,
+			$password,
+			$database
+		);
+
+		// Delete rows of user table
+		$result = $db->query("delete from user"); 
 
 		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
 
@@ -233,6 +266,36 @@ final class uploadTest extends TestCase {
 			$output	
 		);
 	}
+
+
+	// Test to see if script notices duplicate email address in CSV users file
+	public function testCSVFileDuplicateEmailAddress(): void {
+		$ini_array = parse_ini_file("test.ini");
+		$user = $ini_array["correctdb"]["user"];
+		$password = $ini_array["correctdb"]["password"];
+		$host = $ini_array["correctdb"]["host"];
+		$database = $ini_array["correctdb"]["database"];
+		$csv = $ini_array["csv"]["duplicate_email_address"];
+
+		$db = new mysqli(
+			$host,
+			$user,
+			$password,
+			$database
+		);
+
+		// Delete rows of user table
+		$result = $db->query("delete from user"); 
+
+		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
+
+//		echo "OUTPUT: $output\n------\n"; return;
+		$this->assertRegExp(
+			"/WARNING: While parsing the line number \d+, an error occurred: Duplicate entry 'jsmith@gmail.com' for key 'PRIMARY'. Skipping row.../",
+			$output	
+		);
+	}
+
 
 
 
