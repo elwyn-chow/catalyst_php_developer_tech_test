@@ -45,7 +45,7 @@ final class uploadTest extends TestCase {
 
 	// Test to see if incorrect database credentials are handled correctly 
 	public function testWrongDatabaseCredentials(): void {
-		$ini_array = parse_ini_file("database.ini");
+		$ini_array = parse_ini_file("test.ini");
 		$user = $ini_array["incorrectdb"]["user"];
 		$password = $ini_array["incorrectdb"]["password"];
 		$host = $ini_array["incorrectdb"]["host"];
@@ -60,7 +60,7 @@ final class uploadTest extends TestCase {
 
 	// Test to see if correct database credentials are handled correctly 
 	public function testCorrectDatabaseCredentials(): void {
-		$ini_array = parse_ini_file("database.ini");
+		$ini_array = parse_ini_file("test.ini");
 		$user = $ini_array["correctdb"]["user"];
 		$password = $ini_array["correctdb"]["password"];
 		$host = $ini_array["correctdb"]["host"];
@@ -75,7 +75,7 @@ final class uploadTest extends TestCase {
 
 	// Check that database table was created
 	public function testDatabaseTableCreated(): void {
-		$ini_array = parse_ini_file("database.ini");
+		$ini_array = parse_ini_file("test.ini");
 		$user = $ini_array["correctdb"]["user"];
 		$password = $ini_array["correctdb"]["password"];
 		$host = $ini_array["correctdb"]["host"];
@@ -116,5 +116,68 @@ final class uploadTest extends TestCase {
 			// User table does not exist: fail test
 			$this->assertTrue(false);	
 		}
+	}
+
+	// Test to see if filename was entered
+	public function testMissingFilename(): void {
+		$ini_array = parse_ini_file("test.ini");
+		$user = $ini_array["correctdb"]["user"];
+		$password = $ini_array["correctdb"]["password"];
+		$host = $ini_array["correctdb"]["host"];
+
+		$output = `php php/user_upload.php -u $user -p$password -h$host --file 2>&1`;
+
+		$this->assertRegExp(
+			'/Exiting\.\.\. must set the filename option/',
+			$output	
+		);
+	}
+
+	// Test to see if script opens a valid CSV users file
+	public function testCSVFileValid(): void {
+		$ini_array = parse_ini_file("test.ini");
+		$user = $ini_array["correctdb"]["user"];
+		$password = $ini_array["correctdb"]["password"];
+		$host = $ini_array["correctdb"]["host"];
+		$csv = $ini_array["csv"]["valid"];
+
+		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
+
+		$this->assertRegExp(
+			'/Opening CSV file/',
+			$output	
+		);
+	}
+
+	// Test to see if script tries to open a CSV users file that doesn't exist
+	public function testCSVFileDoesntExist(): void {
+		$ini_array = parse_ini_file("test.ini");
+		$user = $ini_array["correctdb"]["user"];
+		$password = $ini_array["correctdb"]["password"];
+		$host = $ini_array["correctdb"]["host"];
+		$csv = $ini_array["csv"]["doesntexist"];
+
+		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
+
+		$this->assertRegExp(
+			"/CSV file .+ does not exist/",
+			$output	
+		);
+	}
+
+	// Test to see if script tries to open a non-readable CSV users file
+	public function testCSVFileUnreadable(): void {
+		$ini_array = parse_ini_file("test.ini");
+		$user = $ini_array["correctdb"]["user"];
+		$password = $ini_array["correctdb"]["password"];
+		$host = $ini_array["correctdb"]["host"];
+		$csv = $ini_array["csv"]["unreadable"];
+
+		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
+
+		$this->assertRegExp(
+			"/CSV file .+ is not readable/",
+			$output	
+		);
 	}
 }

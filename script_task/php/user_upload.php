@@ -94,10 +94,10 @@ function create_table($db) {
 	// Open the database schema file
 	$path = dirname(__FILE__) . '/' . DATABASE_SCHEMA_RELATIVE_PATH;
 	if ( !file_exists($path) ) {
-		die("Cannot open database schema file: $path");
+		die("Database schema file $path does not exist.");
 	}
 	if ( !is_readable($path) ) {
-		die("Cannot read database schema file: $path");
+		die("Database schema file $path is not readable");
 	}
 
 	$fh = fopen($path, 'r');
@@ -135,7 +135,34 @@ function create_table($db) {
 }
 
 //------------------------------------------------------------------------------
+//
+// Imports users from CSV file
+// Inputs: getopts array, database handler
+//
+//
+//------------------------------------------------------------------------------
 
+function import_users($options, $db) {
+	echo "Importing users...\n";
+	$csv = parse_csv_file($options["file"]);
+}
+
+//------------------------------------------------------------------------------
+
+function parse_csv_file($filename) {
+	if ( !file_exists($filename) ) {
+		die("CSV file $filename does not exist");
+	}
+	if ( !is_readable($filename) ) {
+		die("CSV file $filename is not readable");
+	}
+
+	echo "Opening CSV file $filename";
+//	$csv = array_map('str_getcsv', file($filename));
+//	return $csv;
+}
+
+//------------------------------------------------------------------------------
 
 $shortopts = "";
 $shortopts .= "u:"; // MySQL username
@@ -187,3 +214,7 @@ if (isset($options["create_table"])) {
 	exit;
 }
 
+if (!isset($options["file"])) {
+	die("Exiting... must set the filename option\n");
+}
+import_users($options, $db);
