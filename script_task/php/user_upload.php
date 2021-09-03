@@ -101,4 +101,4 @@ catch (mysqli_sql_exception $e) {
 	die("Could not open connection to database: " . $e->getMessage() . "\n");
 }
 
-echo "Connection created\n";
+echo "Database connected\n";

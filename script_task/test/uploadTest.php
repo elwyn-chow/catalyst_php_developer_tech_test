@@ -44,12 +44,32 @@ final class uploadTest extends TestCase {
 	}
 
 	// Test to see if incorrect database credentials are handled correctly 
-	public function testWrongDBCredentials(): void {
-		$output = `php php/user_upload.php -u testuser -p testpassjibberish -hlocalhost 2>&1`;
+	public function testWrongDatabaseCredentials(): void {
+		$ini_array = parse_ini_file("database.ini");
+		$user = $ini_array["incorrectdb"]["user"];
+		$password = $ini_array["incorrectdb"]["password"];
+		$host = $ini_array["incorrectdb"]["host"];
+
+		$output = `php php/user_upload.php -u $user -p$password -h$host 2>&1`;
 
 		$this->assertEquals(
-			"Could not open connection to database: Access denied for user 'testuser'@'localhost'\n",
+			"Could not open connection to database: Access denied for user '$user'@'$host' (using password: YES)\n",
 			$output
+		);
+	}
+
+	// Test to see if correct database credentials are handled correctly 
+	public function testCorrectDatabaseCredentials(): void {
+		$ini_array = parse_ini_file("database.ini");
+		$user = $ini_array["correctdb"]["user"];
+		$password = $ini_array["correctdb"]["password"];
+		$host = $ini_array["correctdb"]["host"];
+
+		$output = `php php/user_upload.php -u $user -p$password -h$host 2>&1`;
+
+		$this->assertRegExp(
+			'/^Database connected/',
+			$output	
 		);
 	}
 
