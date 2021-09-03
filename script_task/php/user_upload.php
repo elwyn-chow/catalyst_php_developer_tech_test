@@ -185,7 +185,7 @@ EO_SQL;
 		} 
 		catch (mysqli_sql_exception $e) {
 			trigger_error(
-				"WARNING: While parsing the line number $row_number, the email address " . $row[2] . " value is invalid. Skipping this row...", 
+				"WARNING: While parsing the line number $row_number, an error occurred: " . $e->getMessage() . ". Skipping row...\n",
 				E_USER_WARNING
 			);
 			continue;
