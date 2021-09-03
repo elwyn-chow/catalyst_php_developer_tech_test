@@ -18,6 +18,22 @@ The script has these command line options:
 
 *******************************************************************************/
 
+//------------------------------------------------------------------------------
+// Global variables and constants
+//------------------------------------------------------------------------------
+
+define('DATABASE_NAME', 'catalyst');
+define('TABLE_NAME', 'user');
+define('DATABASE_SCHEMA_RELATIVE_PATH', "../database/catalyst_schema.sql");
+
+$GLOBALS["dry_run_mode"] = false;
+
+//------------------------------------------------------------------------------
+//
+// Displays help message for script
+//
+//------------------------------------------------------------------------------
+
 function help_message() {
 	$script_name = basename(__FILE__);
 	echo <<<EOD
@@ -39,14 +55,88 @@ EOD;
 }
 
 //------------------------------------------------------------------------------
-// Global variables and constants
+//
+// Connects to database 
+// Input: getopts parameters
+// Output: database handler
+//
 //------------------------------------------------------------------------------
-define('DATABASE_NAME', 'catalyst');
-define('TABLE_NAME', 'user');
 
-$dry_run_mode = false;
+function connect_database($options) {
+	mysqli_report(MYSQLI_REPORT_STRICT | MYSQLI_REPORT_ALL);
+
+	try {
+		$db = new mysqli(
+			$options["h"],
+			$options["u"],
+			$options["p"],
+			DATABASE_NAME		
+		);
+	}
+	catch (mysqli_sql_exception $e) {
+		die("Could not open connection to database: " . $e->getMessage() . "\n");
+	}
+
+	echo "Database connected\n";
+	return $db;
+}
 
 //------------------------------------------------------------------------------
+//
+// Handles create table option by creating table
+// Input: database handler
+//
+//------------------------------------------------------------------------------
+
+function create_table($db) {
+	echo "Creating database table...\n";
+
+	// Open the database schema file
+	$path = dirname(__FILE__) . '/' . DATABASE_SCHEMA_RELATIVE_PATH;
+	if ( !file_exists($path) ) {
+		die("Cannot open database schema file: $path");
+	}
+	if ( !is_readable($path) ) {
+		die("Cannot read database schema file: $path");
+	}
+
+	$fh = fopen($path, 'r');
+
+	// Read the schema file and parse it line by line. 
+	// Execute SQL commands that end in a semi-colon. Skip comments.
+
+	$query = "";
+	while($line = fgets($fh)) {
+		if (preg_match('/^--/', $line)) {
+			// Skip comment line
+		} elseif (preg_match('/\/\*.+\*\/;/', $line)) {
+			// Skip comment line
+		} elseif (preg_match('/;/', $line)) {
+			// Found semi-colon. Execute SQL command
+			$query .= $line;
+
+			try {
+				if (! $GLOBALS["dry_run_mode"] ) {
+					mysqli_query($db, $query);
+				}
+			} 
+			catch (mysqli_sql_exception $e) {
+				die("Error: " . $e->getMessage() . "\n");
+			}
+
+			// Reset query
+			$query = "";
+		} else {
+			$query .= $line;
+		}
+	}
+	fclose($fh);
+
+}
+
+//------------------------------------------------------------------------------
+
+
 $shortopts = "";
 $shortopts .= "u:"; // MySQL username
 $shortopts .= "p:"; // MySQL passowrd 
@@ -71,34 +161,29 @@ if (isset($options["help"])) {
 }
 
 if (isset($options["dry_run"])) {
-	$dry_run_mode = true;
+	echo "Dry run mode ON\n";
+	$GLOBALS["dry_run_mode"] = true;
 }
 
 // Store database authentication details and check that there are values.
 if (!isset($options["u"])) {
 	die("Exiting... must set the username option\n");
 }
-$db_user = $options["u"];
 
 if (!isset($options["p"])) {
 	die("Exiting... must set the password option\n");
 }
-$db_password = $options["p"];
 
 if (!isset($options["h"])) {
 	die("Exiting... must set the host option\n");
 }
-$db_host = $options["h"];
 
 //------------------------------------------------------------------------------
 
-mysqli_report(MYSQLI_REPORT_STRICT | MYSQLI_REPORT_ALL);
+$db = connect_database($options);
 
-try {
-	$db = new mysqli($db_host, $db_user, $db_password, DATABASE_NAME);
-}
-catch (mysqli_sql_exception $e) {
-	die("Could not open connection to database: " . $e->getMessage() . "\n");
+if (isset($options["create_table"])) {
+	create_table($db);
+	exit;
 }
 
-echo "Database connected\n";
