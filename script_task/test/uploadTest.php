@@ -173,6 +173,10 @@ final class uploadTest extends TestCase {
 		$host = $ini_array["correctdb"]["host"];
 		$csv = $ini_array["csv"]["unreadable"];
 
+		// Make the file unreadable (to commit it into git, 
+		// it had to be readable)
+		chmod($csv, 0000); // Make file unreadable
+
 		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
 
 		$this->assertRegExp(
