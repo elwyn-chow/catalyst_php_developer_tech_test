@@ -14,7 +14,7 @@ The script has these command line options:
 * -u – MySQL username
 * -p – MySQL password
 * -h – MySQL host
-* --help – which will output the above list of directives with details.
+* --help – output the above list of directives with details.
 
 *******************************************************************************/
 
@@ -32,7 +32,7 @@ $script_name has the following options:
 * -u – MySQL username
 * -p – MySQL password
 * -h – MySQL host
-* --help – which will output the above list of directives with details.
+* --help – output the above list of directives with details.
 
 Using dry_run mode overrides create_table option.
 EOD;
@@ -74,7 +74,20 @@ if (isset($options["dry_run"])) {
 	$dry_run_mode = true;
 }
 
-// Store database authentication details
-$user = $options["u"];
-echo "User: $user";
+// Store database authentication details and check that there are values.
+if (!isset($options["u"])) {
+	die("Exiting... must set the username option\n");
+}
+$db_user = $options["u"];
+
+if (!isset($options["p"])) {
+	die("Exiting... must set the password option\n");
+}
+$db_password = $options["p"];
+
+if (!isset($options["h"])) {
+	die("Exiting... must set the host option\n");
+}
+$db_host = $options["h"];
+
 var_dump($options);
