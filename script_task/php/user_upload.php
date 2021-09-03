@@ -77,7 +77,7 @@ function connect_database($options) {
 		die("Could not open connection to database: " . $e->getMessage() . "\n");
 	}
 
-	echo "Database connected\n";
+	echo "Database connected...\n";
 	return $db;
 }
 
@@ -209,7 +209,7 @@ function parse_csv_file($filename) {
 		die("CSV file $filename is not readable");
 	}
 
-	echo "Opening CSV file $filename";
+	echo "Opening CSV file $filename...";
 	$csv = array_map('str_getcsv', file($filename));
 	return $csv;
 }
@@ -240,7 +240,7 @@ if (isset($options["help"])) {
 }
 
 if (isset($options["dry_run"])) {
-	echo "Dry run mode ON\n";
+	echo "Dry run mode ON...\n";
 	$GLOBALS["dry_run_mode"] = true;
 }
 
