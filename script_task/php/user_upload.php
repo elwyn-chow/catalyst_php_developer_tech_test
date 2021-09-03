@@ -161,7 +161,6 @@ function import_users($options, $db) {
 
 
 		if(!filter_var(trim($row[2]), FILTER_VALIDATE_EMAIL)) {
-			echo "EMAIL PROB: '" . $row[2] . "'\n";
 			trigger_error(
 				"WARNING: While parsing the line number $row_number, the email address " . $row[2] . " value is invalid. Skipping this row...", 
 				E_USER_WARNING
@@ -176,6 +175,21 @@ function import_users($options, $db) {
 		$firstname = trim(ucfirst($row[0]));
 		$lastname = trim(ucfirst($row[1]));
 		$email = trim(strtolower($row[2]));
+		try {
+			if (! $GLOBALS["dry_run_mode"] ) {
+				$query =<<<EO_SQL
+insert into user VALUES ("$firstname", "$lastname", "$email");
+EO_SQL;
+				mysqli_query($db, $query);
+			}
+		} 
+		catch (mysqli_sql_exception $e) {
+			trigger_error(
+				"WARNING: While parsing the line number $row_number, the email address " . $row[2] . " value is invalid. Skipping this row...", 
+				E_USER_WARNING
+			);
+			continue;
+		}
 	}
 }
 
