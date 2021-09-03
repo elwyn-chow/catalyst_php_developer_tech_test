@@ -139,14 +139,52 @@ function create_table($db) {
 // Imports users from CSV file
 // Inputs: getopts array, database handler
 //
-//
 //------------------------------------------------------------------------------
 
 function import_users($options, $db) {
 	echo "Importing users...\n";
 	$csv = parse_csv_file($options["file"]);
+
+
+	// Parse through all rows but ship header row 
+	for($row_number = 1; $row_number < count($csv); $row_number++) {
+		$row = $csv[$row_number];
+
+		// Check the number of fields
+		if ( count($row) != 3) {
+			trigger_error(
+				"WARNING: While parsing the line number $row_number, there were " . count($row) . " fields when 3 were expected. Skipping this row...", 
+				E_USER_WARNING
+			); 
+		  	continue;	
+		}
+
+
+		if(!filter_var(trim($row[2]), FILTER_VALIDATE_EMAIL)) {
+			echo "EMAIL PROB: '" . $row[2] . "'\n";
+			trigger_error(
+				"WARNING: While parsing the line number $row_number, the email address " . $row[2] . " value is invalid. Skipping this row...", 
+				E_USER_WARNING
+			);
+			continue;
+		}
+
+		// Inputs seem okay. Now modify them slightly...
+		// * by trimming spaces off left and right of string
+		// * uppercasing the first letter of names
+		// * lower casing the email
+		$firstname = trim(ucfirst($row[0]));
+		$lastname = trim(ucfirst($row[1]));
+		$email = trim(strtolower($row[2]));
+	}
 }
 
+//------------------------------------------------------------------------------
+//
+// Parses a CSV file containing user data after running some checks
+// Input: file to parse
+// Output: associative array
+//
 //------------------------------------------------------------------------------
 
 function parse_csv_file($filename) {
@@ -158,8 +196,8 @@ function parse_csv_file($filename) {
 	}
 
 	echo "Opening CSV file $filename";
-//	$csv = array_map('str_getcsv', file($filename));
-//	return $csv;
+	$csv = array_map('str_getcsv', file($filename));
+	return $csv;
 }
 
 //------------------------------------------------------------------------------

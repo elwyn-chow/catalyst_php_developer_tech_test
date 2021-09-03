@@ -184,4 +184,61 @@ final class uploadTest extends TestCase {
 			$output	
 		);
 	}
+
+	// Test to see if script notices too many columns in CSV users file
+	public function testCSVFileTooManyColumns(): void {
+		$ini_array = parse_ini_file("test.ini");
+		$user = $ini_array["correctdb"]["user"];
+		$password = $ini_array["correctdb"]["password"];
+		$host = $ini_array["correctdb"]["host"];
+		$csv = $ini_array["csv"]["too_many_columns"];
+
+		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
+
+		$this->assertRegExp(
+			"/WARNING: While parsing the line number 1, there were 4 fields when 3 were expected. Skipping this row.../",
+			$output	
+		);
+	}
+
+	// Test to see if script notices too few columns in CSV users file
+	public function testCSVFileTooFewColumns(): void {
+		$ini_array = parse_ini_file("test.ini");
+		$user = $ini_array["correctdb"]["user"];
+		$password = $ini_array["correctdb"]["password"];
+		$host = $ini_array["correctdb"]["host"];
+		$csv = $ini_array["csv"]["too_few_columns"];
+
+		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
+
+		$this->assertRegExp(
+			"/WARNING: While parsing the line number \d+, there were 2 fields when 3 were expected. Skipping this row.../",
+			$output	
+		);
+	}
+
+
+	// Test to see if script notices invalid email address in CSV users file
+	public function testCSVFileInvalidEmailAddress(): void {
+		$ini_array = parse_ini_file("test.ini");
+		$user = $ini_array["correctdb"]["user"];
+		$password = $ini_array["correctdb"]["password"];
+		$host = $ini_array["correctdb"]["host"];
+		$csv = $ini_array["csv"]["invalid_email_address"];
+
+		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
+
+		$this->assertRegExp(
+			"/WARNING: While parsing the line number \d+, the email address .+ value is invalid. Skipping this row.../",
+			$output	
+		);
+	}
+
+
+
+
+
+
+
+
 }
