@@ -25,9 +25,9 @@ DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
   `name` varchar(80) DEFAULT NULL,
   `surname` varchar(80) DEFAULT NULL,
-  `email` varchar(320) NOT NULL,
-  PRIMARY KEY (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `email` TEXT NOT NULL,
+  UNIQUE KEY email(email(255))
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --

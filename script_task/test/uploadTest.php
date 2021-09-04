@@ -290,7 +290,7 @@ final class uploadTest extends TestCase {
 		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
 
 		$this->assertRegExp(
-			"/WARNING: While parsing the line number \d+, an error occurred: Duplicate entry 'jsmith@gmail.com' for key 'PRIMARY'. Skipping row.../",
+			"/WARNING: While parsing the line number \d+, an error occurred: Duplicate entry 'jsmith@gmail.com' for key 'email'. Skipping row.../",
 			$output	
 		);
 	}
