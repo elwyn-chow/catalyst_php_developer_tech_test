@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*******************************************************************************
 This PHP script imports a CSV file containing user data (first and last 
