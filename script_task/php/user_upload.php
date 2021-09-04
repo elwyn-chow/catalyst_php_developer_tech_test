@@ -22,20 +22,22 @@ The script has these command line options:
 // Global variables and constants
 //------------------------------------------------------------------------------
 
-define('DATABASE_NAME', 'catalyst');
-define('TABLE_NAME', 'user');
+define('DATABASE_NAME', 'catalyst');	// Database name is catalyst
+define('TABLE_NAME', 'user'); 		// Database table name is "user"
+define('TABLE_FIELDS', 3);		// user table should only have 3 fields
 define('DATABASE_SCHEMA_RELATIVE_PATH', "../database/catalyst_schema.sql");
 
+// Maximum allowed length of firstname and lastname fields
 define('MAXLENGTH_FIRSTNAME', 80);
 define('MAXLENGTH_LASTNAME', 80);
 
+// Remember whether script is being run in dry_run mode
 $GLOBALS["dry_run_mode"] = false;
 
 //------------------------------------------------------------------------------
-//
-// Displays help message for script
-//
-//------------------------------------------------------------------------------
+/**
+ * Displays help message for script
+ */
 
 function help_message() {
 	$script_name = basename(__FILE__);
@@ -58,12 +60,11 @@ EOD;
 }
 
 //------------------------------------------------------------------------------
-//
-// Connects to database 
-// Input: getopts parameters
-// Output: database handler
-//
-//------------------------------------------------------------------------------
+/**
+ * Connects to database 
+ * @param array		$options	getopts parameters
+ * @return database handler
+ */
 
 function connect_database($options) {
 	mysqli_report(MYSQLI_REPORT_STRICT | MYSQLI_REPORT_ALL);
@@ -85,11 +86,10 @@ function connect_database($options) {
 }
 
 //------------------------------------------------------------------------------
-//
-// Handles create table option by creating table
-// Input: database handler
-//
-//------------------------------------------------------------------------------
+/**
+ * Handles create table option by creating MySQL table
+ * @param database handler	$db
+ */
 
 function create_table($db) {
 	echo "Creating database table...\n";
@@ -138,16 +138,15 @@ function create_table($db) {
 }
 
 //------------------------------------------------------------------------------
-//
-// Imports users from CSV file
-// Inputs: getopts array, database handler
-//
-//------------------------------------------------------------------------------
+/**
+ * Imports users from CSV file
+ * @param array			$options	getopts array
+ * @param database handler	$dbh
+ */
 
 function import_users($options, $db) {
 	echo "Importing users...\n";
 	$csv = parse_csv_file($options["file"]);
-
 
 	// Parse through all rows but ship header row 
 	for($row_number = 1; $row_number < count($csv); $row_number++) {
@@ -159,9 +158,9 @@ function import_users($options, $db) {
 		}
 
 		// Check the number of fields
-		if ( count($row) != 3) {
+		if ( count($row) != TABLE_FIELDS) {
 			trigger_error(
-				"WARNING: While parsing the line number $row_number, there were " . count($row) . " fields when 3 were expected. Skipping this row...", 
+				"WARNING: While parsing the line number $row_number, there were " . count($row) . " fields when " . TABLE_FIELDS . " were expected. Skipping this row...", 
 				E_USER_WARNING
 			); 
 		  	continue;	
@@ -232,12 +231,11 @@ EO_SQL;
 }
 
 //------------------------------------------------------------------------------
-//
-// Parses a CSV file containing user data after running some checks
-// Input: file to parse
-// Output: associative array
-//
-//------------------------------------------------------------------------------
+/**
+ * Parses a CSV file containing user data after running some checks
+ * @param	string		$filename 	file to parse
+ * @return	associative array of CSV contents
+ */
 
 function parse_csv_file($filename) {
 	if ( !file_exists($filename) ) {
@@ -253,7 +251,10 @@ function parse_csv_file($filename) {
 }
 
 //------------------------------------------------------------------------------
+// MAIN
+//------------------------------------------------------------------------------
 
+// getopts settings
 $shortopts = "";
 $shortopts .= "u:"; // MySQL username
 $shortopts .= "p:"; // MySQL passowrd 
@@ -307,5 +308,6 @@ if (isset($options["create_table"])) {
 if (!isset($options["file"])) {
 	die("Exiting... must set the filename option\n");
 }
+
 import_users($options, $db);
 exit;
