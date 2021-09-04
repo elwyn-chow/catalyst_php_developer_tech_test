@@ -325,4 +325,142 @@ final class uploadImportCSVTest extends TestCase {
 		);
 	}
 
+	// Test to see if the expected number of rows were imported
+	public function testCSVFileImportCount(): void {
+		$ini_array = parse_ini_file("test.ini");
+		$user = $ini_array["correctdb"]["user"];
+		$password = $ini_array["correctdb"]["password"];
+		$host = $ini_array["correctdb"]["host"];
+		$database = $ini_array["correctdb"]["database"];
+		$csv = $ini_array["csv"]["valid"];
+
+		$db = new mysqli(
+			$host,
+			$user,
+			$password,
+			$database
+		);
+
+		// Delete rows of user table
+		$result = $db->query("delete from user"); 
+
+		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
+
+		// Check number of records
+		$result = $db->query("select count(*) from user"); 
+		$row = $result->fetch_row();
+		$this->assertEquals(
+			// 9 records expected, 1 is a duplicate, 1 has an invalid email address
+			9, 
+			$row[0]
+		);
+	}
+	
+	// Test to see if all the firstnames start with a capital letter
+	public function testCSVFileFirstnameCapitals(): void {
+		$ini_array = parse_ini_file("test.ini");
+		$user = $ini_array["correctdb"]["user"];
+		$password = $ini_array["correctdb"]["password"];
+		$host = $ini_array["correctdb"]["host"];
+		$database = $ini_array["correctdb"]["database"];
+		$csv = $ini_array["csv"]["valid"];
+
+		$db = new mysqli(
+			$host,
+			$user,
+			$password,
+			$database
+		);
+
+		// Delete rows of user table
+		$result = $db->query("delete from user"); 
+
+		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
+
+		// Check that all firstnames start with a capital letter
+		$query =<<<EOSQL
+select count(*) 
+from user
+WHERE BINARY LEFT(name, 1) <> BINARY UPPER(LEFT(name,1))
+EOSQL;
+		$result = $db->query($query);
+		$row = $result->fetch_row();
+
+		$this->assertEquals(
+			0, 
+			$row[0]
+		);
+	}
+
+	// Test to see if all the lastnames start with a capital letter
+	public function testCSVFileLastnameCapitals(): void {
+		$ini_array = parse_ini_file("test.ini");
+		$user = $ini_array["correctdb"]["user"];
+		$password = $ini_array["correctdb"]["password"];
+		$host = $ini_array["correctdb"]["host"];
+		$database = $ini_array["correctdb"]["database"];
+		$csv = $ini_array["csv"]["valid"];
+
+		$db = new mysqli(
+			$host,
+			$user,
+			$password,
+			$database
+		);
+
+		// Delete rows of user table
+		$result = $db->query("delete from user"); 
+
+		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
+
+		// Check that all lastnames start with a capital letter
+		$query =<<<EOSQL
+select count(*) 
+from user
+WHERE BINARY LEFT(surname, 1) <> BINARY UPPER(LEFT(surname,1))
+EOSQL;
+		$result = $db->query($query);
+		$row = $result->fetch_row();
+
+		$this->assertEquals(
+			0, 
+			$row[0]
+		);
+	}
+
+	// Test to see if all the email addresses are lower case
+	public function testCSVFileEmailUppercase(): void {
+		$ini_array = parse_ini_file("test.ini");
+		$user = $ini_array["correctdb"]["user"];
+		$password = $ini_array["correctdb"]["password"];
+		$host = $ini_array["correctdb"]["host"];
+		$database = $ini_array["correctdb"]["database"];
+		$csv = $ini_array["csv"]["valid"];
+
+		$db = new mysqli(
+			$host,
+			$user,
+			$password,
+			$database
+		);
+
+		// Delete rows of user table
+		$result = $db->query("delete from user"); 
+
+		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
+
+		// Check that all email addresses are lowercase
+		$query =<<<EOSQL
+select count(*) 
+from user
+where BINARY email <> BINARY(LOWER(email))
+EOSQL;
+		$result = $db->query($query);
+		$row = $result->fetch_row();
+
+		$this->assertEquals(
+			0,
+			$row[0]
+		);
+	}
 }
