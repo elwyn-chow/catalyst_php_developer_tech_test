@@ -1,1 +1,4 @@
-# catalyst_php_developer_tech_test
+Code, data and specifications for technical test for PHP Developer role at Catalyst.
+
+- Elwyn
+3-4 September, 2021
