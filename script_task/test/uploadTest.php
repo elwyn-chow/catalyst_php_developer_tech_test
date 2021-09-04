@@ -185,7 +185,7 @@ final class uploadTest extends TestCase {
 		);
 	}
 
-	// Test to see if script notices too many columns in CSV users file
+	// Test to see if script detects too many columns in CSV users file
 	public function testCSVFileTooManyColumns(): void {
 		$ini_array = parse_ini_file("test.ini");
 		$user = $ini_array["correctdb"]["user"];
@@ -212,7 +212,7 @@ final class uploadTest extends TestCase {
 		);
 	}
 
-	// Test to see if script notices too few columns in CSV users file
+	// Test to see if script detects too few columns in CSV users file
 	public function testCSVFileTooFewColumns(): void {
 		$ini_array = parse_ini_file("test.ini");
 		$user = $ini_array["correctdb"]["user"];
@@ -240,7 +240,7 @@ final class uploadTest extends TestCase {
 	}
 
 
-	// Test to see if script notices invalid email address in CSV users file
+	// Test to see if script detects invalid email address in CSV users file
 	public function testCSVFileInvalidEmailAddress(): void {
 		$ini_array = parse_ini_file("test.ini");
 		$user = $ini_array["correctdb"]["user"];
@@ -268,7 +268,7 @@ final class uploadTest extends TestCase {
 	}
 
 
-	// Test to see if script notices duplicate email address in CSV users file
+	// Test to see if script detects duplicate email address in CSV users file
 	public function testCSVFileDuplicateEmailAddress(): void {
 		$ini_array = parse_ini_file("test.ini");
 		$user = $ini_array["correctdb"]["user"];
@@ -289,19 +289,63 @@ final class uploadTest extends TestCase {
 
 		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
 
-//		echo "OUTPUT: $output\n------\n"; return;
 		$this->assertRegExp(
 			"/WARNING: While parsing the line number \d+, an error occurred: Duplicate entry 'jsmith@gmail.com' for key 'PRIMARY'. Skipping row.../",
 			$output	
 		);
 	}
 
+	// Test to see if script detects weird characters in a firstname in CSV users file
+	public function testCSVFileInvalidCharsInFirstname(): void {
+		$ini_array = parse_ini_file("test.ini");
+		$user = $ini_array["correctdb"]["user"];
+		$password = $ini_array["correctdb"]["password"];
+		$host = $ini_array["correctdb"]["host"];
+		$database = $ini_array["correctdb"]["database"];
+		$csv = $ini_array["csv"]["invalid_chars_in_firstname"];
 
+		$db = new mysqli(
+			$host,
+			$user,
+			$password,
+			$database
+		);
 
+		// Delete rows of user table
+		$result = $db->query("delete from user"); 
 
+		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
 
+		$this->assertRegExp(
+			"/WARNING: While parsing the line number \d+, the name Saul \"Slash\" had invalid characters that were stripped out.../",
+			$output	
+		);
+	}
 
+	// Test to see if script detects weird characters in a lastname in CSV users file
+	public function testCSVFileInvalidCharsInLastname(): void {
+		$ini_array = parse_ini_file("test.ini");
+		$user = $ini_array["correctdb"]["user"];
+		$password = $ini_array["correctdb"]["password"];
+		$host = $ini_array["correctdb"]["host"];
+		$database = $ini_array["correctdb"]["database"];
+		$csv = $ini_array["csv"]["invalid_chars_in_lastname"];
 
+		$db = new mysqli(
+			$host,
+			$user,
+			$password,
+			$database
+		);
 
+		// Delete rows of user table
+		$result = $db->query("delete from user"); 
+
+		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
+		$this->assertRegExp(
+			"/WARNING: While parsing the line number \d+, the name Comment#This Is Not A Comment had invalid characters that were stripped out.../",
+			$output	
+		);
+	}
 
 }

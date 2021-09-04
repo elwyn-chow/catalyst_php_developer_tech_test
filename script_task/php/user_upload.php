@@ -150,6 +150,11 @@ function import_users($options, $db) {
 	for($row_number = 1; $row_number < count($csv); $row_number++) {
 		$row = $csv[$row_number];
 
+		// Trim leading and trailing whitespace 
+		for( $field_number = 0; $field_number < count($row); $field_number++) {
+			$row[$field_number] = trim($row[$field_number]);
+		}
+
 		// Check the number of fields
 		if ( count($row) != 3) {
 			trigger_error(
@@ -159,8 +164,20 @@ function import_users($options, $db) {
 		  	continue;	
 		}
 
+		// Check for invalid characters in firstname and lastname,
+		// strip them out and state warning
+		foreach(range(0,1) as $field_number) {
+			if (preg_match("/([^A-Za-z\s\-'])/", $row[$field_number])) {
+				trigger_error(
+					"WARNING: While parsing the line number $row_number, the name " . $row[$field_number] . " had invalid characters that were stripped out...", 
+					E_USER_WARNING
+				);
+				$row[$field_number] = preg_replace("/([^A-Za-z\s\-'])/", "", $row[$field_number]);
+			}
+		}
 
-		if(!filter_var(trim($row[2]), FILTER_VALIDATE_EMAIL)) {
+		// Check if email address is valid looking
+		if(!filter_var($row[2], FILTER_VALIDATE_EMAIL)) {
 			trigger_error(
 				"WARNING: While parsing the line number $row_number, the email address " . $row[2] . " value is invalid. Skipping this row...", 
 				E_USER_WARNING
@@ -172,9 +189,9 @@ function import_users($options, $db) {
 		// * by trimming spaces off left and right of string
 		// * uppercasing the first letter of names
 		// * lower casing the email
-		$firstname = trim(ucfirst($row[0]));
-		$lastname = trim(ucfirst($row[1]));
-		$email = trim(strtolower($row[2]));
+		$firstname = ucfirst($row[0]);
+		$lastname = ucfirst($row[1]);
+		$email = strtolower($row[2]);
 		try {
 			if (! $GLOBALS["dry_run_mode"] ) {
 				$query =<<<EO_SQL
