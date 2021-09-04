@@ -348,4 +348,110 @@ final class uploadTest extends TestCase {
 		);
 	}
 
+	// Test to see if script accepts long valid email in CSV users file
+	public function testCSVFileValidLongEmail(): void {
+		$ini_array = parse_ini_file("test.ini");
+		$user = $ini_array["correctdb"]["user"];
+		$password = $ini_array["correctdb"]["password"];
+		$host = $ini_array["correctdb"]["host"];
+		$database = $ini_array["correctdb"]["database"];
+		$csv = $ini_array["csv"]["valid_long_email"];
+
+		$db = new mysqli(
+			$host,
+			$user,
+			$password,
+			$database
+		);
+
+		// Delete rows of user table
+		$result = $db->query("delete from user"); 
+
+		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
+
+		// Should only be one record
+		$result = $db->query("select * from user"); 
+		$row = $result->fetch_row();
+		$this->assertEquals(
+			"is_a_very_very_very_very_very_very_very_very_long_local_part_ok@this.is.the.very.very.very.very.very.very.very.very.very.very.very.very.very.very.very.very.very.very.very.long.local.part.which.can.be.a.maximum.of.two.hundred.and.fifty.five.characters.com",
+			$row[2]
+		);
+	}
+
+	// Test to see if script detects a very long firstname in CSV users file
+	public function testCSVFileFieldTooLongFirstname(): void {
+		$ini_array = parse_ini_file("test.ini");
+		$user = $ini_array["correctdb"]["user"];
+		$password = $ini_array["correctdb"]["password"];
+		$host = $ini_array["correctdb"]["host"];
+		$database = $ini_array["correctdb"]["database"];
+		$csv = $ini_array["csv"]["field_too_long_firstname"];
+
+		$db = new mysqli(
+			$host,
+			$user,
+			$password,
+			$database
+		);
+
+		// Delete rows of user table
+		$result = $db->query("delete from user"); 
+
+		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
+
+		$firstname = "This is way way way way way way way way way way way too long for a first name even though it has no invalid characters";
+		$truncated_firstname = substr($firstname, 0, 80);
+
+		$this->assertRegExp(
+			"/WARNING: While parsing the line number \d+, firstname \"$firstname\" is too long. Truncating firstname.../",
+			$output	
+		);
+
+		// Check record is truncated
+		$result = $db->query("select * from user where email='shorty@short.com'"); 
+		$row = $result->fetch_row();
+		$this->assertEquals(
+			$truncated_firstname,
+			$row[0]
+		);
+	}
+
+	// Test to see if script detects a very long lastname in CSV users file
+	public function testCSVFileFieldTooLongLastname(): void {
+		$ini_array = parse_ini_file("test.ini");
+		$user = $ini_array["correctdb"]["user"];
+		$password = $ini_array["correctdb"]["password"];
+		$host = $ini_array["correctdb"]["host"];
+		$database = $ini_array["correctdb"]["database"];
+		$csv = $ini_array["csv"]["field_too_long_lastname"];
+
+		$db = new mysqli(
+			$host,
+			$user,
+			$password,
+			$database
+		);
+
+		// Delete rows of user table
+		$result = $db->query("delete from user"); 
+
+		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
+
+		$lastname = "This is way way way way way way way way way way way too long for a last name even though it has no invalid characters";
+		$truncated_lastname = substr($lastname, 0, 80);
+
+		$this->assertRegExp(
+			"/WARNING: While parsing the line number \d+, lastname \"$lastname\" is too long. Truncating lastname.../",
+			$output	
+		);
+
+		// Check record is truncated
+		$result = $db->query("select * from user where email='shorty@short.com'"); 
+		$row = $result->fetch_row();
+		$this->assertEquals(
+			$truncated_lastname,
+			$row[1]
+		);
+	}
+
 }

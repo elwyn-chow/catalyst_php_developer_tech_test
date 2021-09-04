@@ -26,6 +26,9 @@ define('DATABASE_NAME', 'catalyst');
 define('TABLE_NAME', 'user');
 define('DATABASE_SCHEMA_RELATIVE_PATH', "../database/catalyst_schema.sql");
 
+define('MAXLENGTH_FIRSTNAME', 80);
+define('MAXLENGTH_LASTNAME', 80);
+
 $GLOBALS["dry_run_mode"] = false;
 
 //------------------------------------------------------------------------------
@@ -192,6 +195,24 @@ function import_users($options, $db) {
 		$firstname = ucfirst($row[0]);
 		$lastname = ucfirst($row[1]);
 		$email = strtolower($row[2]);
+
+		// Check length of names, truncate if too long
+		if (strlen($firstname) > MAXLENGTH_FIRSTNAME) {
+			trigger_error(
+				"WARNING: While parsing the line number $row_number, firstname \"$firstname\" is too long. Truncating firstname...\n",
+				E_USER_WARNING
+			);
+			$firstname = substr($firstname, 0, MAXLENGTH_FIRSTNAME);
+		}
+
+		if (strlen($lastname) > MAXLENGTH_LASTNAME) {
+			trigger_error(
+				"WARNING: While parsing the line number $row_number, lastname \"$lastname\" is too long. Truncating lastname...\n",
+				E_USER_WARNING
+			);
+			$lastname = substr($lastname, 0, MAXLENGTH_LASTNAME);
+		}
+		
 		try {
 			if (! $GLOBALS["dry_run_mode"] ) {
 				$query =<<<EO_SQL
@@ -287,3 +308,4 @@ if (!isset($options["file"])) {
 	die("Exiting... must set the filename option\n");
 }
 import_users($options, $db);
+exit;
