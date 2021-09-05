@@ -12,7 +12,7 @@ final class uploadImportCSVTest extends TestCase {
 		$host = $ini_array["correctdb"]["host"];
 		$csv = $ini_array["csv"]["valid"];
 
-		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
+		$output = `php src/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
 
 		$this->assertRegExp(
 			'/Opening CSV file/',
@@ -28,7 +28,7 @@ final class uploadImportCSVTest extends TestCase {
 		$host = $ini_array["correctdb"]["host"];
 		$csv = $ini_array["csv"]["doesntexist"];
 
-		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
+		$output = `php src/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
 
 		$this->assertRegExp(
 			"/CSV file .+ does not exist/",
@@ -48,7 +48,7 @@ final class uploadImportCSVTest extends TestCase {
 		// it had to be readable)
 		chmod($csv, 0000); // Make file unreadable
 
-		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
+		$output = `php src/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
 
 		$this->assertRegExp(
 			"/CSV file .+ is not readable/",
@@ -75,7 +75,7 @@ final class uploadImportCSVTest extends TestCase {
 		// Delete rows of user table
 		$result = $db->query("delete from user"); 
 
-		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
+		$output = `php src/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
 
 		$this->assertRegExp(
 			"/WARNING: While parsing the line number \d+, there were 4 fields when 3 were expected. Skipping this row.../",
@@ -102,7 +102,7 @@ final class uploadImportCSVTest extends TestCase {
 		// Delete rows of user table
 		$result = $db->query("delete from user"); 
 
-		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
+		$output = `php src/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
 
 		$this->assertRegExp(
 			"/WARNING: While parsing the line number \d+, there were 2 fields when 3 were expected. Skipping this row.../",
@@ -130,7 +130,7 @@ final class uploadImportCSVTest extends TestCase {
 		// Delete rows of user table
 		$result = $db->query("delete from user"); 
 
-		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
+		$output = `php src/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
 
 		$this->assertRegExp(
 			"/WARNING: While parsing the line number \d+, the email address .+ value is invalid. Skipping this row.../",
@@ -158,7 +158,7 @@ final class uploadImportCSVTest extends TestCase {
 		// Delete rows of user table
 		$result = $db->query("delete from user"); 
 
-		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
+		$output = `php src/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
 
 		$this->assertRegExp(
 			"/WARNING: While parsing the line number \d+, an error occurred: Duplicate entry 'jsmith@gmail.com' for key 'email'. Skipping row.../",
@@ -185,7 +185,7 @@ final class uploadImportCSVTest extends TestCase {
 		// Delete rows of user table
 		$result = $db->query("delete from user"); 
 
-		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
+		$output = `php src/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
 
 		$this->assertRegExp(
 			"/WARNING: While parsing the line number \d+, the name Saul \"Slash\" had invalid characters that were stripped out.../",
@@ -212,7 +212,7 @@ final class uploadImportCSVTest extends TestCase {
 		// Delete rows of user table
 		$result = $db->query("delete from user"); 
 
-		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
+		$output = `php src/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
 		$this->assertRegExp(
 			"/WARNING: While parsing the line number \d+, the name Comment#This Is Not A Comment had invalid characters that were stripped out.../",
 			$output	
@@ -238,7 +238,7 @@ final class uploadImportCSVTest extends TestCase {
 		// Delete rows of user table
 		$result = $db->query("delete from user"); 
 
-		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
+		$output = `php src/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
 
 		// Should only be one record
 		$result = $db->query("select * from user"); 
@@ -268,7 +268,7 @@ final class uploadImportCSVTest extends TestCase {
 		// Delete rows of user table
 		$result = $db->query("delete from user"); 
 
-		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
+		$output = `php src/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
 
 		$firstname = "This is way way way way way way way way way way way too long for a first name even though it has no invalid characters";
 		$truncated_firstname = substr($firstname, 0, 80);
@@ -306,7 +306,7 @@ final class uploadImportCSVTest extends TestCase {
 		// Delete rows of user table
 		$result = $db->query("delete from user"); 
 
-		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
+		$output = `php src/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
 
 		$lastname = "This is way way way way way way way way way way way too long for a last name even though it has no invalid characters";
 		$truncated_lastname = substr($lastname, 0, 80);
@@ -344,7 +344,7 @@ final class uploadImportCSVTest extends TestCase {
 		// Delete rows of user table
 		$result = $db->query("delete from user"); 
 
-		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
+		$output = `php src/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
 
 		// Check number of records
 		$result = $db->query("select count(*) from user"); 
@@ -375,7 +375,7 @@ final class uploadImportCSVTest extends TestCase {
 		// Delete rows of user table
 		$result = $db->query("delete from user"); 
 
-		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
+		$output = `php src/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
 
 		// Check that all firstnames start with a capital letter
 		$query =<<<EOSQL
@@ -411,7 +411,7 @@ EOSQL;
 		// Delete rows of user table
 		$result = $db->query("delete from user"); 
 
-		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
+		$output = `php src/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
 
 		// Check that all lastnames start with a capital letter
 		$query =<<<EOSQL
@@ -447,7 +447,7 @@ EOSQL;
 		// Delete rows of user table
 		$result = $db->query("delete from user"); 
 
-		$output = `php php/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
+		$output = `php src/user_upload.php -u $user -p$password -h$host --file $csv 2>&1`;
 
 		// Check that all email addresses are lowercase
 		$query =<<<EOSQL

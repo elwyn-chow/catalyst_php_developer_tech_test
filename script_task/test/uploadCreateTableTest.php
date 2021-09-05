@@ -35,7 +35,7 @@ final class uploadCreateTableTest extends TestCase {
 		}
 
 		// Create table
-		$output = `php php/user_upload.php -u $user -p$password -h$host --create_table 2>&1`;
+		$output = `php src/user_upload.php -u $user -p$password -h$host --create_table 2>&1`;
 
 
 		$result = $db->query("select 1 from user LIMIT 1"); 

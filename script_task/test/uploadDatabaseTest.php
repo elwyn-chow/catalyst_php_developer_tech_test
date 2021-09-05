@@ -10,7 +10,7 @@ final class uploadDatabaseTest extends TestCase {
 		$password = $ini_array["incorrectdb"]["password"];
 		$host = $ini_array["incorrectdb"]["host"];
 
-		$output = `php php/user_upload.php -u $user -p$password -h$host 2>&1`;
+		$output = `php src/user_upload.php -u $user -p$password -h$host 2>&1`;
 
 		$this->assertEquals(
 			"Could not open connection to database: Access denied for user '$user'@'$host' (using password: YES)\n",
@@ -25,7 +25,7 @@ final class uploadDatabaseTest extends TestCase {
 		$password = $ini_array["correctdb"]["password"];
 		$host = $ini_array["correctdb"]["host"];
 
-		$output = `php php/user_upload.php -u $user -p$password -h$host 2>&1`;
+		$output = `php src/user_upload.php -u $user -p$password -h$host 2>&1`;
 
 		$this->assertRegExp(
 			'/Database connected/',
