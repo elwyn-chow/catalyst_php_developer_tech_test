@@ -12,16 +12,24 @@
 // Constants and global variables
 //------------------------------------------------------------------------------
 
+// Associative array where key is a divisor and value is the text to print out.
+ 
 $GLOBALS["mapping"] = array(
 	3 => "foo",
 	5 => "bar",
 );
 
 //------------------------------------------------------------------------------
+/**
+ * processes a number and outputs text (if it is divible by any of the divisors)
+ * or the number if it is not.
+ * @param number	$number
+ */
 
 function parseValue($number) {
 	$return_value = "";
 
+	// See if number is divisible by any of the divisors
 	foreach ($GLOBALS["mapping"] as $denomination => $str) {
 		if ( $number % $denomination == 0 ) {
 			// $number is divisible by $denomination
@@ -29,7 +37,8 @@ function parseValue($number) {
 		}
 	}
 
-	// $number is not divisible by any of the denominations, just return it.
+	// If $number is not divisible by any of the denominations, set return
+	// value to equal number.
 	if ( strcmp($return_value, "" ) == 0) {
 		$return_value = $number;
 	}
@@ -38,6 +47,10 @@ function parseValue($number) {
 }	
 
 //------------------------------------------------------------------------------
+// MAIN	
+//------------------------------------------------------------------------------
+
 $range = range(1, 100);
 
+// Map range of numbers then join them and print results.
 echo implode(', ', (array_map('parseValue', $range)));
